@@ -1,5 +1,6 @@
 ﻿
 
+using APICatalago.Validations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -15,6 +16,7 @@ namespace APICatalago.Models
 
         [Required(ErrorMessage ="O nome é obrigatorio")]
         [StringLength(30, ErrorMessage ="O nome deve ter entre 3 e 30 caracteres", MinimumLength = 3)]
+        [PrimeiraLetraMaiscula]
         public string? Nome { get; set; }
 
         [Required]
