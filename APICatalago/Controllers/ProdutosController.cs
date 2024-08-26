@@ -1,6 +1,7 @@
 ﻿using APICatalago.Context;
 using APICatalago.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace APICatalago.Controllers
@@ -16,10 +17,11 @@ namespace APICatalago.Controllers
             _context = context;
         }
 
+        // exemplos de requisição async
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> Get() 
+        public async Task<ActionResult<IEnumerable<Produto>>> GetAsync() 
         {
-            var produtos = _context.Produtos.AsNoTracking().Take(10).ToList();
+            var produtos = await _context.Produtos.AsNoTracking().Take(10).ToListAsync();
 
             if (produtos is null)
             {
@@ -30,10 +32,12 @@ namespace APICatalago.Controllers
 
         }
 
+
+        // Exemplo de uso de Model Binding
         [HttpGet("{id:int}", Name = "ObterProduto")]
-        public ActionResult<Produto> Get(int id)
+        public async Task<ActionResult<Produto>> GetAsync([FromQuery] int id)
         {
-            var produto = _context.Produtos.AsNoTracking().FirstOrDefault(x => x.ProdutoId == id);
+            var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(x => x.ProdutoId == id);
             if (produto is null)
             {
                 return NotFound("Produto não encontrado");
