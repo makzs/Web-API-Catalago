@@ -14,11 +14,13 @@ namespace APICatalago.Controllers
         // injeção de dependencia
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly ILogger _logger;
 
-        public CategoriasController(AppDbContext context, IConfiguration configuration)
+        public CategoriasController(AppDbContext context, IConfiguration configuration, ILogger logger)
         {
             _context = context;
             _configuration = configuration;
+            _logger = logger;
         }
 
         //Exemplo de como ler dados que estão na configuração do projeto (appsettings.json)
@@ -36,6 +38,7 @@ namespace APICatalago.Controllers
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
+            _logger.LogInformation("------------ GET/CATEGORIAS/PRODUTOS ------------");
             //return _context.Categorias.Include(p => p.Produtos).AsNoTracking().ToList();
             return _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 10).AsNoTracking().ToList();
         }
@@ -45,6 +48,8 @@ namespace APICatalago.Controllers
         [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
+            _logger.LogInformation("------------ GET/CATEGORIAS ------------");
+
             var categorias = _context.Categorias.AsNoTracking().Take(10).ToList();
 
             if (categorias is null)
@@ -58,6 +63,8 @@ namespace APICatalago.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
+            _logger.LogInformation($"------------ GET/CATEGORIAS/ID = {id} ------------");
+
             //testando middleware de tratamento de excecoes
             //throw new Exception("Exceção ao retornar categoria por id");
 
@@ -75,6 +82,8 @@ namespace APICatalago.Controllers
         [HttpPost]
         public ActionResult Post(Categoria categoria)
         {
+            _logger.LogInformation("------------ POST/CATEGORIAS ------------");
+
             if (categoria is null)
             {
                 return BadRequest();
@@ -90,6 +99,9 @@ namespace APICatalago.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Categoria categoria)
         {
+
+            _logger.LogInformation($"------------ PUT/CATEGORIAS/ID = {id} ------------");
+
             if (id != categoria.CategoriaId)
             {
                 return BadRequest();
@@ -104,6 +116,9 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
+
+            _logger.LogInformation($"------------ DELETE/CATEGORIAS/ID = {id} ------------");
+
             var categoria = _context.Categorias.FirstOrDefault(x => x.CategoriaId == id);
 
             if (categoria is null)
