@@ -55,6 +55,10 @@ namespace APICatalago.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
+            //testando middleware de tratamento de excecoes
+            //throw new Exception("Exceção ao retornar categoria por id");
+
+
             var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(x => x.CategoriaId == id);
 
             if (categoria is null)

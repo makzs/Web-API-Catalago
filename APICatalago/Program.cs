@@ -1,4 +1,5 @@
 using APICatalago.Context;
+using APICatalago.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -23,10 +24,12 @@ var configuracaoTeste2 = builder.Configuration["secao1:chave2"];
 
 var app = builder.Build();
 
+// middlewares
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();
