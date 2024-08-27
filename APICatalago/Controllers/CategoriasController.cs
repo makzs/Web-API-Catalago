@@ -10,11 +10,26 @@ namespace APICatalago.Controllers
     public class CategoriasController : ControllerBase
     {
 
+        // injeção de dependencia
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public CategoriasController(AppDbContext context)
+        public CategoriasController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+        }
+
+        //Exemplo de como ler dados que estão na configuração do projeto (appsettings.json)
+        [HttpGet("LerArquivosDeConfiguracao")]
+        public string GetValores()
+        {
+            var chave1 = _configuration["chave1"];
+            var chave2 = _configuration["chave2"];
+
+            var secao1 = _configuration["secao1:chave2"];
+
+            return $"chave 1 = {chave1} \nchave 2 = {chave2} \nSeção 1 -> Chave 2 = {secao1}";
         }
 
         [HttpGet("produtos")]

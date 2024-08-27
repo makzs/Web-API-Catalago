@@ -17,6 +17,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(SQLConnection);
 });
 
+// exemplos de leitura das configurações utilizando a instancia builder
+var configuracaoTeste1 = builder.Configuration["chave1"];
+var configuracaoTeste2 = builder.Configuration["secao1:chave2"];
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
