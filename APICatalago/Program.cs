@@ -8,8 +8,15 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // ignora o erro de ciclos (erro de repetição de um get entidade que faz referencia a outra entidade de forma ciclica)
-builder.Services.AddControllers().AddJsonOptions(options =>
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+// adiciona um filtro global de tratamento de exceção, assim podendo nao precisar utilizar try catch
+builder.Services.AddControllers(options =>
+    {
+        options.Filters.Add(typeof(ApiExceptionFilter));
+    })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
