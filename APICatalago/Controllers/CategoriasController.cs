@@ -1,4 +1,5 @@
 ﻿using APICatalago.Context;
+using APICatalago.Filters;
 using APICatalago.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,9 @@ namespace APICatalago.Controllers
             return _context.Categorias.Include(p => p.Produtos).Where(c => c.CategoriaId <= 10).AsNoTracking().ToList();
         }
 
-[HttpGet]
+        // exemplo de utilização de filtros
+        [HttpGet]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
             var categorias = _context.Categorias.AsNoTracking().Take(10).ToList();

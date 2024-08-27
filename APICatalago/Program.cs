@@ -1,5 +1,6 @@
 using APICatalago.Context;
 using APICatalago.Extensions;
+using APICatalago.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -21,6 +22,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // exemplos de leitura das configurações utilizando a instancia builder
 var configuracaoTeste1 = builder.Configuration["chave1"];
 var configuracaoTeste2 = builder.Configuration["secao1:chave2"];
+
+builder.Services.AddScoped<ApiLoggingFilter>();
 
 var app = builder.Build();
 
