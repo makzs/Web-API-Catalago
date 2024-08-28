@@ -2,6 +2,7 @@ using APICatalago.Context;
 using APICatalago.Extensions;
 using APICatalago.Filters;
 using APICatalago.Logging;
+using APICatalago.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -31,12 +32,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 var configuracaoTeste1 = builder.Configuration["chave1"];
 var configuracaoTeste2 = builder.Configuration["secao1:chave2"];
 
-builder.Services.AddScoped<ApiLoggingFilter>();
+//exemplo de filtro
+//builder.Services.AddScoped<ApiLoggingFilter>();
+//builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
+//{
+//    LogLevel = LogLevel.Information
+//}));
 
-builder.Logging.AddProvider(new CustomLoggerProvider(new CustomLoggerProviderConfiguration
-{
-    LogLevel = LogLevel.Information
-}));
+
+// adicionando a injeção de dependencia do repository
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+
 
 var app = builder.Build();
 
