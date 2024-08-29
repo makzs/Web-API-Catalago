@@ -42,6 +42,7 @@ var configuracaoTeste2 = builder.Configuration["secao1:chave2"];
 
 // adicionando a injeção de dependencia do repository
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 
 
 var app = builder.Build();
