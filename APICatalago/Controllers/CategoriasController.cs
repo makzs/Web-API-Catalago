@@ -13,11 +13,12 @@ namespace APICatalago.Controllers
     {
 
         // injeção de dependencia
-        private readonly ICategoriaRepository _repository;
+        private readonly IRepository<Categoria> _repository;
+        //private readonly ICategoriaRepository _repository;
         //private readonly IConfiguration _configuration;
         //private readonly ILogger _logger;
 
-        public CategoriasController(ICategoriaRepository repository)
+        public CategoriasController(IRepository<Categoria> repository)
         {
             _repository = repository;
         }
@@ -61,12 +62,21 @@ namespace APICatalago.Controllers
         //}
 
         //Utilizando Repository
+        //[HttpGet]
+        //public ActionResult<IEnumerable<Categoria>> Get()
+        //{
+        //    var categorias = _repository.GetCategorias();
+        //    return Ok(categorias);
+        //}
+
+        // Utilizando Repository Generico:
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _repository.GetCategorias();
+            var categorias = _repository.GetAll();
             return Ok(categorias);
         }
+
 
         // Get por Id sem utilizar repository
         //[HttpGet("{id:int}", Name = "ObterCategoria")]
@@ -88,17 +98,31 @@ namespace APICatalago.Controllers
         //    return Ok(categoria);
         //}
 
+
         //Utilizando Repository
+        //[HttpGet("{id:int}", Name = "ObterCategoria")]
+        //public ActionResult<Categoria> Get(int id)
+        //{
+        //    var categoria = _repository.GetCategoria(id);
+
+        //    if (categoria is null)
+        //        return NotFound();
+
+        //    return Ok(categoria);
+        //}
+
+        // Utilizando repository generico:
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _repository.GetCategoria(id);
+            var categoria = _repository.Get(c=> c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound();
 
             return Ok(categoria);
         }
+
 
         // Sem utilizar Repository
         //[HttpPost]
@@ -119,6 +143,19 @@ namespace APICatalago.Controllers
         //}
 
         // Utilizando Repository
+        //[HttpPost]
+        //public ActionResult Post(Categoria categoria)
+        //{
+        //    if (categoria is null)
+        //        return BadRequest();
+
+        //    var categoriaCriada = _repository.Create(categoria);
+
+        //    return new CreatedAtRouteResult("ObterCategoria", 
+        //        new { id = categoriaCriada.CategoriaId }, categoriaCriada);
+        //}
+
+        // utilizando repository generico:
         [HttpPost]
         public ActionResult Post(Categoria categoria)
         {
@@ -127,9 +164,10 @@ namespace APICatalago.Controllers
 
             var categoriaCriada = _repository.Create(categoria);
 
-            return new CreatedAtRouteResult("ObterCategoria", 
+            return new CreatedAtRouteResult("ObterCategoria",
                 new { id = categoriaCriada.CategoriaId }, categoriaCriada);
         }
+
 
         // sem utilizar repository
         //[HttpPut("{id:int}")]
@@ -150,6 +188,17 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando repository
+        //[HttpPut("{id:int}")]
+        //public ActionResult Put(int id, Categoria categoria)
+        //{
+        //    if (categoria is null)
+        //        return BadRequest();
+
+        //    _repository.Update(categoria);
+        //    return Ok();
+        //}
+
+        // utilizando repository generico
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Categoria categoria)
         {
@@ -159,6 +208,7 @@ namespace APICatalago.Controllers
             _repository.Update(categoria);
             return Ok();
         }
+
 
         // sem utilizar repository
         //[HttpDelete("{id:int}")]
@@ -182,15 +232,28 @@ namespace APICatalago.Controllers
 
 
         // utilizando repository
+        //[HttpDelete("{id:int}")]
+        //public ActionResult Delete(int id)
+        //{
+        //    var categoria = _repository.GetCategoria(id);
+
+        //    if (categoria is null)
+        //        return NotFound();
+            
+        //    var categoriaExcluida = _repository.Delete(id);
+        //    return Ok(categoriaExcluida);
+        //}
+
+        // utilizando repository generico
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var categoria = _repository.GetCategoria(id);
+            var categoria = _repository.Get(c => c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound();
-            
-            var categoriaExcluida = _repository.Delete(id);
+
+            var categoriaExcluida = _repository.Delete(categoria);
             return Ok(categoriaExcluida);
         }
     }

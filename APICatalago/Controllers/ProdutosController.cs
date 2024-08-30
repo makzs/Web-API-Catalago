@@ -4,6 +4,7 @@ using APICatalago.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Core.Types;
 
 namespace APICatalago.Controllers
 {
@@ -11,11 +12,25 @@ namespace APICatalago.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _repository;
+        private readonly IProdutoRepository _produtoRepository;
+        private readonly IRepository<Produto> _repository;
 
-        public ProdutosController(IProdutoRepository repository)
+        public ProdutosController(IRepository<Produto> repository, IProdutoRepository produtoRepository)
         {
             _repository = repository;
+            _produtoRepository = produtoRepository;
+        }
+
+        // novo metodo especifico do repository generico
+        [HttpGet("Produtos/{id}")]
+        public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int id)
+        {
+            var produtos = _produtoRepository.GetProdutosPorCategoria(id);
+
+            if (produtos is null)
+                return BadRequest();
+
+            return Ok(produtos);
         }
 
         // sem utilizar padrao Repository
@@ -35,10 +50,25 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando Padrao Repository
+        //[HttpGet]
+        //public ActionResult<IEnumerable<Produto>> Get()
+        //{
+        //    var produtos = _repository.GetProdutos();
+
+        //    if (produtos is null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return Ok(produtos);
+        //}
+
+
+        // Utilizando repository generico
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _repository.GetProdutos();
+            var produtos = _repository.GetAll();
 
             if (produtos is null)
             {
@@ -47,6 +77,7 @@ namespace APICatalago.Controllers
 
             return Ok(produtos);
         }
+
 
         // sem utilizar padrao repository
         //// Exemplo de uso de Model Binding
@@ -62,16 +93,30 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando padrao repository
-        [HttpGet("{id:int}", Name="ObterProduto")]
+        //[HttpGet("{id:int}", Name="ObterProduto")]
+        //public ActionResult<Produto> GetAction(int id)
+        //{
+        //    var produto = _repository.GetProduto(id);
+
+        //    if (produto is null)
+        //        return NotFound();
+
+        //    return Ok(produto);
+        //}
+
+
+        // Utilizando repository generico:
+        [HttpGet("{id:int}", Name = "ObterProduto")]
         public ActionResult<Produto> GetAction(int id)
         {
-            var produto = _repository.GetProduto(id);
+            var produto = _repository.Get(p=> p.ProdutoId == id);
 
             if (produto is null)
                 return NotFound();
 
             return Ok(produto);
         }
+
 
         // sem utilizar o padrao repository
         //[HttpPost]
@@ -90,6 +135,19 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando o padrao repository
+        //[HttpPost]
+        //public ActionResult Post(Produto produto)
+        //{
+        //    if (produto is null)
+        //        return BadRequest();
+
+        //    var novoProduto = _repository.Create(produto);
+
+        //    return new CreatedAtRouteResult("ObterProduto",
+        //        new { id = novoProduto.ProdutoId }, novoProduto);
+        //}
+
+        // utilizando repository generico
         [HttpPost]
         public ActionResult Post(Produto produto)
         {
@@ -101,6 +159,7 @@ namespace APICatalago.Controllers
             return new CreatedAtRouteResult("ObterProduto",
                 new { id = novoProduto.ProdutoId }, novoProduto);
         }
+
 
         // sem utilizar o padrao repository
         //[HttpPut("{id:int}")]
@@ -118,6 +177,28 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando o padrao repository
+        //[HttpPut("{id:int}")]
+        //public ActionResult Put(int id, Produto produto)
+        //{
+        //    if (id != produto.ProdutoId)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    bool atualizado = _repository.Update(produto);
+
+        //    if (atualizado)
+        //    {
+        //        return Ok(produto);
+        //    }
+        //    else
+        //    {
+        //        return StatusCode(500, $"Falha em atualizar o produto de id = {id}");
+        //    }
+
+        //}
+
+        // utilizando repository generico:
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Produto produto)
         {
@@ -126,18 +207,12 @@ namespace APICatalago.Controllers
                 return BadRequest();
             }
 
-            bool atualizado = _repository.Update(produto);
+            var produtoAtualizado = _repository.Update(produto);
 
-            if (atualizado)
-            {
-                return Ok(produto);
-            }
-            else
-            {
-                return StatusCode(500, $"Falha em atualizar o produto de id = {id}");
-            }
+            return Ok(produtoAtualizado);
 
         }
+
 
         // sem utilizar o padrao repository
         //[HttpDelete("{id:int}")]
@@ -159,16 +234,14 @@ namespace APICatalago.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var deletado = _repository.Delete(id);
+            var produto = _repository.Get(p => p.ProdutoId == id);
 
-            if (deletado)
-            {
-                return Ok($"Produto de id = {id} foi deletado com sucesso");
-            }
-            else
-            {
-                return StatusCode(500, $"Falha em deletar o produto de id = {id}");
-            }
+            if (produto is null)
+                return NotFound();
+
+            var produtoDeletado = _repository.Delete(produto);
+
+            return Ok(produtoDeletado);
         }
 
     }

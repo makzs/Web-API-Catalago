@@ -3,6 +3,7 @@ using APICatalago.Extensions;
 using APICatalago.Filters;
 using APICatalago.Logging;
 using APICatalago.Repositories;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -43,6 +44,7 @@ var configuracaoTeste2 = builder.Configuration["secao1:chave2"];
 // adicionando a injeção de dependencia do repository
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 
 var app = builder.Build();
