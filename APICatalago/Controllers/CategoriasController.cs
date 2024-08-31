@@ -4,6 +4,7 @@ using APICatalago.Models;
 using APICatalago.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol.Core.Types;
 
 namespace APICatalago.Controllers
 {
@@ -13,14 +14,16 @@ namespace APICatalago.Controllers
     {
 
         // injeção de dependencia
-        private readonly IRepository<Categoria> _repository;
+        private readonly IUnitOfWork _uof;
+        //private readonly IRepository<Categoria> _repository;
         //private readonly ICategoriaRepository _repository;
         //private readonly IConfiguration _configuration;
         //private readonly ILogger _logger;
 
-        public CategoriasController(IRepository<Categoria> repository)
+
+        public CategoriasController(IUnitOfWork uof)
         {
-            _repository = repository;
+            _uof = uof;
         }
 
         //Exemplo de como ler dados que estão na configuração do projeto (appsettings.json)
@@ -70,12 +73,22 @@ namespace APICatalago.Controllers
         //}
 
         // Utilizando Repository Generico:
+        //[HttpGet]
+        //public ActionResult<IEnumerable<Categoria>> Get()
+        //{
+        //    var categorias = _repository.GetAll();
+        //    return Ok(categorias);
+        //}
+
+
+        // Utilizando o padrao Unity Of Work
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _repository.GetAll();
+            var categorias = _uof.CategoriaRepository.GetAll();
             return Ok(categorias);
         }
+
 
 
         // Get por Id sem utilizar repository
@@ -112,10 +125,23 @@ namespace APICatalago.Controllers
         //}
 
         // Utilizando repository generico:
+        //[HttpGet("{id:int}", Name = "ObterCategoria")]
+        //public ActionResult<Categoria> Get(int id)
+        //{
+        //    var categoria = _repository.Get(c=> c.CategoriaId == id);
+
+        //    if (categoria is null)
+        //        return NotFound();
+
+        //    return Ok(categoria);
+        //}
+
+
+        // Utilizando o padrao Unity Of Work
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _repository.Get(c=> c.CategoriaId == id);
+            var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound();
@@ -156,17 +182,33 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando repository generico:
+        //[HttpPost]
+        //public ActionResult Post(Categoria categoria)
+        //{
+        //    if (categoria is null)
+        //        return BadRequest();
+
+        //    var categoriaCriada = _repository.Create(categoria);
+
+        //    return new CreatedAtRouteResult("ObterCategoria",
+        //        new { id = categoriaCriada.CategoriaId }, categoriaCriada);
+        //}
+
+
+        // Utilizando o padrao Unity Of Work
         [HttpPost]
         public ActionResult Post(Categoria categoria)
         {
             if (categoria is null)
                 return BadRequest();
 
-            var categoriaCriada = _repository.Create(categoria);
+            var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
+            _uof.commit();
 
             return new CreatedAtRouteResult("ObterCategoria",
                 new { id = categoriaCriada.CategoriaId }, categoriaCriada);
         }
+
 
 
         // sem utilizar repository
@@ -199,13 +241,26 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando repository generico
+        //[HttpPut("{id:int}")]
+        //public ActionResult Put(int id, Categoria categoria)
+        //{
+        //    if (categoria is null)
+        //        return BadRequest();
+
+        //    _repository.Update(categoria);
+        //    return Ok();
+        //}
+
+
+        // utilizando o padrao Unity of Work
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Categoria categoria)
         {
             if (categoria is null)
                 return BadRequest();
 
-            _repository.Update(categoria);
+            _uof.CategoriaRepository.Update(categoria);
+            _uof.commit();
             return Ok();
         }
 
@@ -239,22 +294,37 @@ namespace APICatalago.Controllers
 
         //    if (categoria is null)
         //        return NotFound();
-            
+
         //    var categoriaExcluida = _repository.Delete(id);
         //    return Ok(categoriaExcluida);
         //}
 
         // utilizando repository generico
+        //[HttpDelete("{id:int}")]
+        //public ActionResult Delete(int id)
+        //{
+        //    var categoria = _repository.Get(c => c.CategoriaId == id);
+
+        //    if (categoria is null)
+        //        return NotFound();
+
+        //    var categoriaExcluida = _repository.Delete(categoria);
+        //    return Ok(categoriaExcluida);
+        //}
+
+        // Utilizando o padrao Unity of Work
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var categoria = _repository.Get(c => c.CategoriaId == id);
+            var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound();
 
-            var categoriaExcluida = _repository.Delete(categoria);
+            var categoriaExcluida = _uof.CategoriaRepository.Delete(categoria);
+            _uof.commit();
             return Ok(categoriaExcluida);
         }
+
     }
 }

@@ -12,26 +12,40 @@ namespace APICatalago.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _produtoRepository;
-        private readonly IRepository<Produto> _repository;
+        private readonly IUnitOfWork _uof;
+        //private readonly IProdutoRepository _produtoRepository;
+        //private readonly IRepository<Produto> _repository;
 
-        public ProdutosController(IRepository<Produto> repository, IProdutoRepository produtoRepository)
+        public ProdutosController(IUnitOfWork uof)
         {
-            _repository = repository;
-            _produtoRepository = produtoRepository;
+            _uof = uof;
         }
 
-        // novo metodo especifico do repository generico
+        //// novo metodo especifico do repository generico
+        //[HttpGet("Produtos/{id}")]
+        //public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int id)
+        //{
+        //    var produtos = _produtoRepository.GetProdutosPorCategoria(id);
+
+        //    if (produtos is null)
+        //        return BadRequest();
+
+        //    return Ok(produtos);
+        //}
+
+
+        // novo metodo especifico do repository generico no padrao Unity of Work
         [HttpGet("Produtos/{id}")]
-        public ActionResult <IEnumerable<Produto>> GetProdutosCategoria(int id)
+        public ActionResult<IEnumerable<Produto>> GetProdutosCategoria(int id)
         {
-            var produtos = _produtoRepository.GetProdutosPorCategoria(id);
+            var produtos = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
 
             if (produtos is null)
                 return BadRequest();
 
             return Ok(produtos);
         }
+
 
         // sem utilizar padrao Repository
         //// exemplos de requisição async
@@ -65,10 +79,25 @@ namespace APICatalago.Controllers
 
 
         // Utilizando repository generico
+        //[HttpGet]
+        //public ActionResult<IEnumerable<Produto>> Get()
+        //{
+        //    var produtos = _repository.GetAll();
+
+        //    if (produtos is null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return Ok(produtos);
+        //}
+
+
+        // utilizando o padrao Unity of Work
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _repository.GetAll();
+            var produtos = _uof.ProdutoRepository.GetAll();
 
             if (produtos is null)
             {
@@ -106,10 +135,23 @@ namespace APICatalago.Controllers
 
 
         // Utilizando repository generico:
+        //[HttpGet("{id:int}", Name = "ObterProduto")]
+        //public ActionResult<Produto> GetAction(int id)
+        //{
+        //    var produto = _repository.Get(p=> p.ProdutoId == id);
+
+        //    if (produto is null)
+        //        return NotFound();
+
+        //    return Ok(produto);
+        //}
+
+
+        // utilizando o padrao Unity of Work
         [HttpGet("{id:int}", Name = "ObterProduto")]
         public ActionResult<Produto> GetAction(int id)
         {
-            var produto = _repository.Get(p=> p.ProdutoId == id);
+            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
             if (produto is null)
                 return NotFound();
@@ -148,18 +190,32 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando repository generico
+        //[HttpPost]
+        //public ActionResult Post(Produto produto)
+        //{
+        //    if (produto is null)
+        //        return BadRequest();
+
+        //    var novoProduto = _repository.Create(produto);
+
+        //    return new CreatedAtRouteResult("ObterProduto",
+        //        new { id = novoProduto.ProdutoId }, novoProduto);
+        //}
+
+
+        // utilizando o padrao Unity of Work
         [HttpPost]
         public ActionResult Post(Produto produto)
         {
             if (produto is null)
                 return BadRequest();
 
-            var novoProduto = _repository.Create(produto);
+            var novoProduto = _uof.ProdutoRepository.Create(produto);
+            _uof.commit();
 
             return new CreatedAtRouteResult("ObterProduto",
                 new { id = novoProduto.ProdutoId }, novoProduto);
         }
-
 
         // sem utilizar o padrao repository
         //[HttpPut("{id:int}")]
@@ -199,6 +255,22 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando repository generico:
+        //[HttpPut("{id:int}")]
+        //public ActionResult Put(int id, Produto produto)
+        //{
+        //    if (id != produto.ProdutoId)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    var produtoAtualizado = _repository.Update(produto);
+
+        //    return Ok(produtoAtualizado);
+
+        //}
+
+
+        // utilizando o padrao Unity of Work
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Produto produto)
         {
@@ -207,7 +279,8 @@ namespace APICatalago.Controllers
                 return BadRequest();
             }
 
-            var produtoAtualizado = _repository.Update(produto);
+            var produtoAtualizado = _uof.ProdutoRepository.Update(produto);
+            _uof.commit();
 
             return Ok(produtoAtualizado);
 
@@ -231,15 +304,31 @@ namespace APICatalago.Controllers
         //}
 
         // utilizando o padrao reopsitory
+        //[HttpDelete("{id:int}")]
+        //public ActionResult Delete(int id)
+        //{
+        //    var produto = _repository.Get(p => p.ProdutoId == id);
+
+        //    if (produto is null)
+        //        return NotFound();
+
+        //    var produtoDeletado = _repository.Delete(produto);
+
+        //    return Ok(produtoDeletado);
+        //}
+
+
+        // utilizando o padrao Unity of Work
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var produto = _repository.Get(p => p.ProdutoId == id);
+            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
             if (produto is null)
                 return NotFound();
 
-            var produtoDeletado = _repository.Delete(produto);
+            var produtoDeletado = _uof.ProdutoRepository.Delete(produto);
+            _uof.commit();
 
             return Ok(produtoDeletado);
         }

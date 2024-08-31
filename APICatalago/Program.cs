@@ -45,6 +45,7 @@ var configuracaoTeste2 = builder.Configuration["secao1:chave2"];
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped<IUnitOfWork, UnityOfWork>();
 
 
 var app = builder.Build();
