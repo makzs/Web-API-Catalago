@@ -3,6 +3,8 @@ using APICatalago.DTOs;
 using APICatalago.Models;
 using APICatalago.Repositories;
 using AutoMapper;
+using Azure;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -230,6 +232,33 @@ namespace APICatalago.Controllers
 
             return new CreatedAtRouteResult("ObterProduto",
                 new { id = novoProdutoDTO.ProdutoId }, novoProdutoDTO);
+        }
+
+        [HttpPatch("{id}/UpdatePartial")]
+        public ActionResult<ProdutoDTOUpdateResponse> Patch(int id, JsonPatchDocument<ProdutoDTOUpdateRequest> patchProdutoDto)
+        {
+            if(patchProdutoDto is null || id <= 0)
+                return BadRequest();
+
+            var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
+
+            if(produto is null)
+                return NotFound();
+
+
+            var produtoUpdateRequest = _mapper.Map<ProdutoDTOUpdateRequest>(produto);
+
+            patchProdutoDto.ApplyTo(produtoUpdateRequest, ModelState);
+
+            if (!ModelState.IsValid || TryValidateModel(produtoUpdateRequest))
+                return BadRequest(ModelState);
+
+            _mapper.Map(produtoUpdateRequest, produto);
+
+            _uof.ProdutoRepository.Update(produto);
+            _uof.commit();
+
+            return Ok(_mapper.Map<ProdutoDTOUpdateRequest>(produto));
         }
 
         // sem utilizar o padrao repository
