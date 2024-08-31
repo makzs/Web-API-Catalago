@@ -1,4 +1,6 @@
 ﻿using APICatalago.Context;
+using APICatalago.DTOs;
+using APICatalago.DTOs.Mappings;
 using APICatalago.Filters;
 using APICatalago.Models;
 using APICatalago.Repositories;
@@ -81,12 +83,16 @@ namespace APICatalago.Controllers
         //}
 
 
-        // Utilizando o padrao Unity Of Work
+        // Utilizando o padrao Unity Of Work e DTO
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> Get()
+        public ActionResult<IEnumerable<CategoriaDTO>> Get()
         {
             var categorias = _uof.CategoriaRepository.GetAll();
-            return Ok(categorias);
+
+            var categoriasDto = categorias.ToCategoriaDTOList();
+
+            return Ok(categoriasDto);
+
         }
 
 
@@ -137,14 +143,16 @@ namespace APICatalago.Controllers
         //}
 
 
-        // Utilizando o padrao Unity Of Work
+        // Utilizando o padrao Unity Of Work e DTO
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult<Categoria> Get(int id)
+        public ActionResult<CategoriaDTO> Get(int id)
         {
             var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound();
+
+            var CategoriaDTO = categoria.ToCategoriaDTO();
 
             return Ok(categoria);
         }
@@ -195,18 +203,22 @@ namespace APICatalago.Controllers
         //}
 
 
-        // Utilizando o padrao Unity Of Work
+        // Utilizando o padrao Unity Of Work e DTO
         [HttpPost]
-        public ActionResult Post(Categoria categoria)
+        public ActionResult<CategoriaDTO> Post(CategoriaDTO categoriaDto)
         {
-            if (categoria is null)
+            if (categoriaDto is null)
                 return BadRequest();
+
+            var categoria = categoriaDto.ToCategoria();
 
             var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
             _uof.commit();
 
+            var NovaCategoriaDTO = categoriaCriada.ToCategoriaDTO();
+
             return new CreatedAtRouteResult("ObterCategoria",
-                new { id = categoriaCriada.CategoriaId }, categoriaCriada);
+                new { id = NovaCategoriaDTO.CategoriaId }, NovaCategoriaDTO);
         }
 
 
@@ -252,16 +264,21 @@ namespace APICatalago.Controllers
         //}
 
 
-        // utilizando o padrao Unity of Work
+        // utilizando o padrao Unity of Work e DTO
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Categoria categoria)
+        public ActionResult<CategoriaDTO> Put(int id, CategoriaDTO categoriaDto)
         {
-            if (categoria is null)
+            if (categoriaDto is null)
                 return BadRequest();
 
-            _uof.CategoriaRepository.Update(categoria);
+            var categoria = categoriaDto.ToCategoria();
+
+            var categoriaAtualizada = _uof.CategoriaRepository.Update(categoria);
             _uof.commit();
-            return Ok();
+
+            var CategoriaAtualizadaDTO = categoriaAtualizada.ToCategoriaDTO();
+
+            return Ok(CategoriaAtualizadaDTO);
         }
 
 
@@ -312,9 +329,10 @@ namespace APICatalago.Controllers
         //    return Ok(categoriaExcluida);
         //}
 
-        // Utilizando o padrao Unity of Work
+
+        // Utilizando o padrao Unity of Work e DTO
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public ActionResult<CategoriaDTO> Delete(int id)
         {
             var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
 
@@ -323,7 +341,10 @@ namespace APICatalago.Controllers
 
             var categoriaExcluida = _uof.CategoriaRepository.Delete(categoria);
             _uof.commit();
-            return Ok(categoriaExcluida);
+
+            var categoriaExcluidaDTO = categoriaExcluida.ToCategoriaDTO();
+
+            return Ok(categoriaExcluidaDTO);
         }
 
     }

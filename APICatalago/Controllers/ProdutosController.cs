@@ -1,6 +1,8 @@
 ﻿using APICatalago.Context;
+using APICatalago.DTOs;
 using APICatalago.Models;
 using APICatalago.Repositories;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +15,14 @@ namespace APICatalago.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly IUnitOfWork _uof;
+        private readonly IMapper _mapper;
         //private readonly IProdutoRepository _produtoRepository;
         //private readonly IRepository<Produto> _repository;
 
-        public ProdutosController(IUnitOfWork uof)
+        public ProdutosController(IUnitOfWork uof, IMapper mapper)
         {
             _uof = uof;
+            _mapper = mapper;
         }
 
         //// novo metodo especifico do repository generico
@@ -34,16 +38,19 @@ namespace APICatalago.Controllers
         //}
 
 
-        // novo metodo especifico do repository generico no padrao Unity of Work
+        // novo metodo especifico do repository generico no padrao Unity of Work e utilizando DTO
         [HttpGet("Produtos/{id}")]
-        public ActionResult<IEnumerable<Produto>> GetProdutosCategoria(int id)
+        public ActionResult<IEnumerable<ProdutoDTO>> GetProdutosCategoria(int id)
         {
             var produtos = _uof.ProdutoRepository.GetProdutosPorCategoria(id);
 
             if (produtos is null)
                 return BadRequest();
 
-            return Ok(produtos);
+            // var destino = _mapper.Map<Destino>(origem);
+            var produtosDTO = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+
+            return Ok(produtosDTO);
         }
 
 
@@ -93,9 +100,9 @@ namespace APICatalago.Controllers
         //}
 
 
-        // utilizando o padrao Unity of Work
+        // utilizando o padrao Unity of Work e DTO
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> Get()
+        public ActionResult<IEnumerable<ProdutoDTO>> Get()
         {
             var produtos = _uof.ProdutoRepository.GetAll();
 
@@ -104,7 +111,9 @@ namespace APICatalago.Controllers
                 return NotFound();
             }
 
-            return Ok(produtos);
+            var produtosDTO = _mapper.Map<IEnumerable<ProdutoDTO>>(produtos);
+
+            return Ok(produtosDTO);
         }
 
 
@@ -147,16 +156,18 @@ namespace APICatalago.Controllers
         //}
 
 
-        // utilizando o padrao Unity of Work
+        // utilizando o padrao Unity of Work e DTO
         [HttpGet("{id:int}", Name = "ObterProduto")]
-        public ActionResult<Produto> GetAction(int id)
+        public ActionResult<ProdutoDTO> GetAction(int id)
         {
             var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
             if (produto is null)
                 return NotFound();
 
-            return Ok(produto);
+            var produtoDTO = _mapper.Map<ProdutoDTO>(produto);
+
+            return Ok(produtoDTO);
         }
 
 
@@ -205,16 +216,20 @@ namespace APICatalago.Controllers
 
         // utilizando o padrao Unity of Work
         [HttpPost]
-        public ActionResult Post(Produto produto)
+        public ActionResult<ProdutoDTO> Post(ProdutoDTO produtoDto)
         {
-            if (produto is null)
+            if (produtoDto is null)
                 return BadRequest();
+
+            var produto = _mapper.Map<Produto>(produtoDto);
 
             var novoProduto = _uof.ProdutoRepository.Create(produto);
             _uof.commit();
 
+            var novoProdutoDTO = _mapper.Map<ProdutoDTO>(novoProduto);
+
             return new CreatedAtRouteResult("ObterProduto",
-                new { id = novoProduto.ProdutoId }, novoProduto);
+                new { id = novoProdutoDTO.ProdutoId }, novoProdutoDTO);
         }
 
         // sem utilizar o padrao repository
@@ -272,17 +287,21 @@ namespace APICatalago.Controllers
 
         // utilizando o padrao Unity of Work
         [HttpPut("{id:int}")]
-        public ActionResult Put(int id, Produto produto)
+        public ActionResult<ProdutoDTO> Put(int id, ProdutoDTO produtoDto)
         {
-            if (id != produto.ProdutoId)
+            if (id != produtoDto.ProdutoId)
             {
                 return BadRequest();
             }
 
+            var produto = _mapper.Map<Produto>(produtoDto);
+
             var produtoAtualizado = _uof.ProdutoRepository.Update(produto);
             _uof.commit();
 
-            return Ok(produtoAtualizado);
+            var produtoAtualizadoDTO = _mapper.Map<ProdutoDTO>(produtoAtualizado);
+
+            return Ok(produtoAtualizadoDTO);
 
         }
 
@@ -320,7 +339,7 @@ namespace APICatalago.Controllers
 
         // utilizando o padrao Unity of Work
         [HttpDelete("{id:int}")]
-        public ActionResult Delete(int id)
+        public ActionResult<ProdutoDTO> Delete(int id)
         {
             var produto = _uof.ProdutoRepository.Get(p => p.ProdutoId == id);
 
@@ -330,7 +349,9 @@ namespace APICatalago.Controllers
             var produtoDeletado = _uof.ProdutoRepository.Delete(produto);
             _uof.commit();
 
-            return Ok(produtoDeletado);
+            var produtoDeletadoDTO = _mapper.Map<ProdutoDTO>(produtoDeletado);
+
+            return Ok(produtoDeletadoDTO);
         }
 
     }
