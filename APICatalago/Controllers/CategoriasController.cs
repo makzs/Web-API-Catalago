@@ -3,9 +3,11 @@ using APICatalago.DTOs;
 using APICatalago.DTOs.Mappings;
 using APICatalago.Filters;
 using APICatalago.Models;
+using APICatalago.Pagination;
 using APICatalago.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using NuGet.Protocol.Core.Types;
 
 namespace APICatalago.Controllers
@@ -95,6 +97,29 @@ namespace APICatalago.Controllers
 
         }
 
+
+        // implementação da paginação
+        [HttpGet("Pagination")]
+        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasParameters categoriasParameters)
+        {
+            var categorias = _uof.CategoriaRepository.GetCategorias(categoriasParameters);
+
+            var metadata = new
+            {
+                categorias.TotalCount,
+                categorias.PageSize,
+                categorias.CurrentPage,
+                categorias.TotalPages,
+                categorias.HasNext,
+                categorias.HasPrevious
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+            var categoriasDto = categorias.ToCategoriaDTOList();
+
+            return Ok(categoriasDto);
+        }
 
 
         // Get por Id sem utilizar repository
