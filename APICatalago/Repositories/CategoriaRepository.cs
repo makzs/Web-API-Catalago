@@ -2,6 +2,7 @@
 using APICatalago.Models;
 using APICatalago.Pagination;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace APICatalago.Repositories
 {
@@ -20,5 +21,18 @@ namespace APICatalago.Repositories
             return categoriasOrdenadas;
         }
 
+        public PagedList<Categoria> GetCategoriasFiltroNome(CategoriaFiltroNome categoriaFiltroParams)
+        {
+            var categorias = GetAll().AsQueryable();
+
+            if (!string.IsNullOrEmpty(categoriaFiltroParams.Nome))
+            {
+                categorias = categorias.Where(c => c.Nome.Contains(categoriaFiltroParams.Nome));
+            }
+
+            var categoriasFiltradas = PagedList<Categoria>.ToPagedList(categorias, categoriaFiltroParams.PageNumber, categoriaFiltroParams.PageSize);
+
+            return categoriasFiltradas;
+        }
     }
 }

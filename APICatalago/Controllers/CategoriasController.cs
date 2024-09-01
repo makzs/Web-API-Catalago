@@ -121,6 +121,28 @@ namespace APICatalago.Controllers
             return Ok(categoriasDto);
         }
 
+        // implementando paginação com filtro de dados
+        [HttpGet("filter/nome/pagination")]
+        public ActionResult<IEnumerable<CategoriaDTO>> GetCategoriasFiltradas([FromQuery] CategoriaFiltroNome categoriaFiltroNome)
+        {
+            var categorias = _uof.CategoriaRepository.GetCategoriasFiltroNome(categoriaFiltroNome);
+
+            var metadata = new
+            {
+                categorias.TotalCount,
+                categorias.PageSize,
+                categorias.CurrentPage,
+                categorias.TotalPages,
+                categorias.HasNext,
+                categorias.HasPrevious
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+            var categoriasDto = categorias.ToCategoriaDTOList();
+
+            return Ok(categoriasDto);
+        }
 
         // Get por Id sem utilizar repository
         //[HttpGet("{id:int}", Name = "ObterCategoria")]
