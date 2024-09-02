@@ -5,8 +5,8 @@ namespace APICatalago.Repositories
 {
     public interface ICategoriaRepository : IRepository<Categoria>
     {
-        PagedList<Categoria> GetCategorias(CategoriasParameters categoriasParams);
-        PagedList<Categoria> GetCategoriasFiltroNome(CategoriaFiltroNome categoriaFiltroParams);
+        Task<PagedList<Categoria>> GetCategoriasAsync(CategoriasParameters categoriasParams);
+        Task<PagedList<Categoria>> GetCategoriasFiltroNomeAsync(CategoriaFiltroNome categoriaFiltroParams);
 
     }
 }

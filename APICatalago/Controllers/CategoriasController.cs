@@ -87,9 +87,9 @@ namespace APICatalago.Controllers
 
         // Utilizando o padrao Unity Of Work e DTO
         [HttpGet]
-        public ActionResult<IEnumerable<CategoriaDTO>> Get()
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {
-            var categorias = _uof.CategoriaRepository.GetAll();
+            var categorias = await _uof.CategoriaRepository.GetAllAsync();
 
             var categoriasDto = categorias.ToCategoriaDTOList();
 
@@ -100,9 +100,9 @@ namespace APICatalago.Controllers
 
         // implementação da paginação
         [HttpGet("Pagination")]
-        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasParameters categoriasParameters)
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get([FromQuery] CategoriasParameters categoriasParameters)
         {
-            var categorias = _uof.CategoriaRepository.GetCategorias(categoriasParameters);
+            var categorias = await _uof.CategoriaRepository.GetCategoriasAsync(categoriasParameters);
 
             var metadata = new
             {
@@ -123,9 +123,9 @@ namespace APICatalago.Controllers
 
         // implementando paginação com filtro de dados
         [HttpGet("filter/nome/pagination")]
-        public ActionResult<IEnumerable<CategoriaDTO>> GetCategoriasFiltradas([FromQuery] CategoriaFiltroNome categoriaFiltroNome)
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetCategoriasFiltradas([FromQuery] CategoriaFiltroNome categoriaFiltroNome)
         {
-            var categorias = _uof.CategoriaRepository.GetCategoriasFiltroNome(categoriaFiltroNome);
+            var categorias = await _uof.CategoriaRepository.GetCategoriasFiltroNomeAsync(categoriaFiltroNome);
 
             var metadata = new
             {
@@ -192,9 +192,9 @@ namespace APICatalago.Controllers
 
         // Utilizando o padrao Unity Of Work e DTO
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public ActionResult<CategoriaDTO> Get(int id)
+        public async Task<ActionResult<CategoriaDTO>> Get(int id)
         {
-            var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
+            var categoria = await _uof.CategoriaRepository.GetAsync(c => c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound();
@@ -252,7 +252,7 @@ namespace APICatalago.Controllers
 
         // Utilizando o padrao Unity Of Work e DTO
         [HttpPost]
-        public ActionResult<CategoriaDTO> Post(CategoriaDTO categoriaDto)
+        public async Task<ActionResult<CategoriaDTO>> Post(CategoriaDTO categoriaDto)
         {
             if (categoriaDto is null)
                 return BadRequest();
@@ -260,7 +260,7 @@ namespace APICatalago.Controllers
             var categoria = categoriaDto.ToCategoria();
 
             var categoriaCriada = _uof.CategoriaRepository.Create(categoria);
-            _uof.commit();
+            await _uof.commitAsync();
 
             var NovaCategoriaDTO = categoriaCriada.ToCategoriaDTO();
 
@@ -313,7 +313,7 @@ namespace APICatalago.Controllers
 
         // utilizando o padrao Unity of Work e DTO
         [HttpPut("{id:int}")]
-        public ActionResult<CategoriaDTO> Put(int id, CategoriaDTO categoriaDto)
+        public async Task<ActionResult<CategoriaDTO>> Put(int id, CategoriaDTO categoriaDto)
         {
             if (categoriaDto is null)
                 return BadRequest();
@@ -321,7 +321,7 @@ namespace APICatalago.Controllers
             var categoria = categoriaDto.ToCategoria();
 
             var categoriaAtualizada = _uof.CategoriaRepository.Update(categoria);
-            _uof.commit();
+            await _uof.commitAsync();
 
             var CategoriaAtualizadaDTO = categoriaAtualizada.ToCategoriaDTO();
 
@@ -379,15 +379,15 @@ namespace APICatalago.Controllers
 
         // Utilizando o padrao Unity of Work e DTO
         [HttpDelete("{id:int}")]
-        public ActionResult<CategoriaDTO> Delete(int id)
+        public async Task<ActionResult<CategoriaDTO>> Delete(int id)
         {
-            var categoria = _uof.CategoriaRepository.Get(c => c.CategoriaId == id);
+            var categoria = await _uof.CategoriaRepository.GetAsync(c => c.CategoriaId == id);
 
             if (categoria is null)
                 return NotFound();
 
             var categoriaExcluida = _uof.CategoriaRepository.Delete(categoria);
-            _uof.commit();
+            await _uof.commitAsync();
 
             var categoriaExcluidaDTO = categoriaExcluida.ToCategoriaDTO();
 
