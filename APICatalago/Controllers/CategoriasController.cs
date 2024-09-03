@@ -5,6 +5,7 @@ using APICatalago.Filters;
 using APICatalago.Models;
 using APICatalago.Pagination;
 using APICatalago.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -87,6 +88,7 @@ namespace APICatalago.Controllers
 
         // Utilizando o padrao Unity Of Work e DTO
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {
             var categorias = await _uof.CategoriaRepository.GetAllAsync();
