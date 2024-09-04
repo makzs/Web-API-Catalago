@@ -5,6 +5,7 @@ using APICatalago.Filters;
 using APICatalago.Logging;
 using APICatalago.Models;
 using APICatalago.Repositories;
+using APICatalago.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -80,6 +81,7 @@ builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUnitOfWork, UnityOfWork>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 
 builder.Services.AddAutoMapper(typeof(ProdutoDTOMappingProfile));
