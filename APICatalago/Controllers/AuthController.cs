@@ -18,13 +18,94 @@ public class AuthController : ControllerBase
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(ITokenService tokenService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+    public AuthController(ITokenService tokenService, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration, ILogger<AuthController> logger)
     {
         _tokenService = tokenService;
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
+        _logger = logger;
+    }
+
+    // Requisição para criar roles no banco de dados
+    [HttpPost]
+    [Route("CreateRole")]
+    [Authorize(Policy = "SuperAdminOnly")]
+    public async Task<IActionResult> CreateRole(string roleName)
+    {
+        var roleExists = await _roleManager.RoleExistsAsync(roleName);
+
+        if (!roleExists)
+        {
+            var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+            if (roleResult.Succeeded)
+            {
+                _logger.LogInformation(1, "Role adicionada");
+                return StatusCode(StatusCodes.Status200OK,
+                   new ResponseDTO { Status = "Success", 
+                   Message = $"Role {roleName} adiocinada com sucesso"} );
+            }
+            else
+            {
+                _logger.LogInformation(2, "Error");
+                return StatusCode(StatusCodes.Status400BadRequest,
+                   new ResponseDTO
+                   {
+                       Status = "Error",
+                       Message = $"Ocorreu um problema em tentar adicionar {roleName} "
+                   });
+            }
+
+        }
+        return StatusCode(StatusCodes.Status400BadRequest,
+                   new ResponseDTO
+                   {
+                       Status = "Error",
+                       Message = $"Role {roleName} ja existe"
+                   });
+    }
+
+    // Requisição para atribuir role a um usuario registrado
+    [HttpPost]
+    [Route("AddUserRole")]
+    [Authorize(Policy = "SuperAdminOnly")]
+    public async Task<IActionResult> AddUserRole(string email, string roleName)
+    {
+        var user = await _userManager.FindByEmailAsync(email);
+
+        if (user != null)
+        {
+            var result = await _userManager.AddToRoleAsync(user, roleName);
+            if(result.Succeeded)
+            {
+                _logger.LogInformation(1, "Role atribuida com sucesso");
+                return StatusCode(StatusCodes.Status200OK,
+                   new ResponseDTO
+                   {
+                       Status = "Success",
+                       Message = $"Role {roleName} atribuida a {email} com sucesso"
+                   });
+            }
+            else
+            {
+                _logger.LogInformation(2, "Error");
+                return StatusCode(StatusCodes.Status400BadRequest,
+                   new ResponseDTO
+                   {
+                       Status = "Error",
+                       Message = $"Ocorreu um problema em atribuir {roleName} a {email} "
+                   });
+            }
+        }
+        return StatusCode(StatusCodes.Status400BadRequest,
+                   new ResponseDTO
+                   {
+                       Status = "Error",
+                       Message = $"Não foi possivel localizar o usuario"
+                   });
     }
 
     [HttpPost]
@@ -41,6 +122,7 @@ public class AuthController : ControllerBase
             {
                 new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.Email, user.Email!),
+                new Claim("id", user.UserName!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -140,7 +222,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    [Authorize]
+    [Authorize(Policy = "ExclusivePolicyOnly")]
     [HttpPost]
     [Route("revoke/{username}")]
     public async Task<IActionResult> Revoke(string username)

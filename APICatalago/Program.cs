@@ -105,6 +105,23 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// configurando politicas de autorização
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+
+    options.AddPolicy("SuperAdminOnly", policy => policy.RequireRole("Admin").RequireClaim("id", "erik"));
+
+    options.AddPolicy("UserOnly", policy => policy.RequireRole("usuario"));
+
+    options.AddPolicy("ExclusivePolicyOnly", policy =>
+    {
+    policy.RequireAssertion(context => context.User.HasClaim(Claim =>
+                            Claim.Type == "id" && Claim.Value == "erik") ||
+                            context.User.IsInRole("SuperAdmin"));
+    });
+});
+
 // adicionando a injeção de dependencia do repository
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();

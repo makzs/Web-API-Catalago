@@ -5,6 +5,7 @@ using APICatalago.Pagination;
 using APICatalago.Repositories;
 using AutoMapper;
 using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -154,6 +155,7 @@ namespace APICatalago.Controllers
 
         // utilizando o padrao Unity of Work e DTO
         [HttpGet]
+        [Authorize(Policy ="UserOnly")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()
         {
             var produtos = await _uof.ProdutoRepository.GetAllAsync();
