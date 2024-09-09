@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: OrigensComAcessoPermitido,
     policy =>
     {
-        policy.WithOrigins("https://apirequest.io")
+        policy.WithOrigins("https://localhost:7163")
             .WithMethods("GET", "POST")
             .AllowAnyHeader();
     });
@@ -157,6 +157,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseCors(OrigensComAcessoPermitido);
 
