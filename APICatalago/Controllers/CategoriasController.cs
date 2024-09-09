@@ -6,6 +6,7 @@ using APICatalago.Models;
 using APICatalago.Pagination;
 using APICatalago.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -13,6 +14,7 @@ using NuGet.Protocol.Core.Types;
 
 namespace APICatalago.Controllers
 {
+    [EnableCors("OrigensComAcessoPermitido")]
     [Route("[controller]")]
     [ApiController]
     public class CategoriasController : ControllerBase
@@ -88,7 +90,7 @@ namespace APICatalago.Controllers
 
         // Utilizando o padrao Unity Of Work e DTO
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {
             var categorias = await _uof.CategoriaRepository.GetAllAsync();
@@ -193,6 +195,7 @@ namespace APICatalago.Controllers
 
 
         // Utilizando o padrao Unity Of Work e DTO
+        [DisableCors]
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public async Task<ActionResult<CategoriaDTO>> Get(int id)
         {
