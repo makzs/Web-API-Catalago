@@ -6,6 +6,7 @@ using APICatalago.Models;
 using APICatalago.RateLimitOptions;
 using APICatalago.Repositories;
 using APICatalago.Services;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
@@ -154,6 +155,22 @@ builder.Services.AddRateLimiter(ratelimiteroptions =>
     });
     ratelimiteroptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 } );
+
+// configurando versionamento da API
+builder.Services.AddApiVersioning(o =>
+{
+    o.DefaultApiVersion = new ApiVersion(1, 0);
+    o.AssumeDefaultVersionWhenUnspecified = true;
+    o.ReportApiVersions = true;
+    o.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader(),
+        new UrlSegmentApiVersionReader());
+        
+}).AddApiExplorer(apiExplorer =>
+{
+    apiExplorer.GroupNameFormat = "'v'VVV";
+    apiExplorer.SubstituteApiVersionInUrl = true;
+});
 
 // adicionando a injeção de dependencia do repository
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
