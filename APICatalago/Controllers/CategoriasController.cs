@@ -8,6 +8,7 @@ using APICatalago.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using NuGet.Protocol.Core.Types;
@@ -17,6 +18,7 @@ namespace APICatalago.Controllers
     [EnableCors("OrigensComAcessoPermitido")]
     [Route("[controller]")]
     [ApiController]
+    [EnableRateLimiting("fixedwindow")]
     public class CategoriasController : ControllerBase
     {
 
@@ -90,6 +92,7 @@ namespace APICatalago.Controllers
 
         // Utilizando o padrao Unity Of Work e DTO
         [HttpGet]
+        [DisableRateLimiting]
         //[Authorize]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {

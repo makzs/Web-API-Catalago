@@ -3,10 +3,12 @@ using APICatalago.DTOs.Mappings;
 using APICatalago.Extensions;
 using APICatalago.Filters;
 using APICatalago.Models;
+using APICatalago.RateLimitOptions;
 using APICatalago.Repositories;
 using APICatalago.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -136,6 +138,23 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+// configurando Rate Limiting
+
+var MyOptions = new MyRateLimitOptions();
+
+builder.Configuration.GetSection(MyRateLimitOptions.MyRateLimit).Bind(MyOptions);
+
+builder.Services.AddRateLimiter(ratelimiteroptions =>
+{
+    ratelimiteroptions.AddFixedWindowLimiter(policyName: "fixedwindow", options =>
+    {
+        options.PermitLimit = MyOptions.PermitLimit;
+        options.Window = TimeSpan.FromSeconds(MyOptions.Window);
+        options.QueueLimit = MyOptions.QueueLimit;
+    });
+    ratelimiteroptions.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+} );
+
 // adicionando a injeção de dependencia do repository
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
@@ -159,6 +178,10 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseCors(OrigensComAcessoPermitido);
 
