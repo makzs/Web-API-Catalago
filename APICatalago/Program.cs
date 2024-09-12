@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NuGet.Common;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -51,6 +52,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "apiagenda", Version = "v1" });
+
+    var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
     {

@@ -154,6 +154,11 @@ namespace APICatalago.Controllers
 
 
         // utilizando o padrao Unity of Work e DTO
+
+        /// <summary>
+        /// Exibe uma relação de produtos
+        /// </summary>
+        /// <returns>Retorna uma listade objetos Produto</returns>
         [HttpGet]
         [Authorize(Policy ="UserOnly")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()

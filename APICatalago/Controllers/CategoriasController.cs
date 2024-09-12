@@ -19,6 +19,8 @@ namespace APICatalago.Controllers
     [Route("[controller]")]
     [ApiController]
     [EnableRateLimiting("fixedwindow")]
+    // indica tipo de resposta
+    [Produces("application/json")]
     public class CategoriasController : ControllerBase
     {
 
@@ -91,6 +93,11 @@ namespace APICatalago.Controllers
 
 
         // Utilizando o padrao Unity Of Work e DTO
+
+        /// <summary>
+        /// Obtem uma lista de objetos Categoria
+        /// </summary>
+        /// <returns>Umalista de objetos Categoria</returns>
         [HttpGet]
         [DisableRateLimiting]
         //[Authorize]
@@ -198,6 +205,12 @@ namespace APICatalago.Controllers
 
 
         // Utilizando o padrao Unity Of Work e DTO
+
+        /// <summary>
+        /// Obtem uma Categoria pelo seu Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Objetos Categoria</returns>
         [DisableCors]
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public async Task<ActionResult<CategoriaDTO>> Get(int id)
@@ -259,6 +272,23 @@ namespace APICatalago.Controllers
 
 
         // Utilizando o padrao Unity Of Work e DTO
+
+        /// <summary>
+        /// Inclui uma nova categoria
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de  request:
+        ///     
+        ///     POST api/categorias
+        ///     {
+        ///         "categoriaId": 1,
+        ///         "nome": "categoria1",
+        ///         "imagemUrl": "http://teste.net/1.jpg"
+        ///      }
+        /// </remarks>
+        /// <param name="categoriaDto"></param>
+        /// <returns>O objeto Categoria incluido</returns>
+        /// <remarks>Retorna um objeto Categoria incluido</remarks>
         [HttpPost]
         public async Task<ActionResult<CategoriaDTO>> Post(CategoriaDTO categoriaDto)
         {
