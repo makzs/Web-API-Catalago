@@ -217,7 +217,7 @@ namespace APICatalago.Controllers
 
         // utilizando o padrao Unity of Work e DTO
         [HttpGet("{id:int}", Name = "ObterProduto")]
-        public async Task<ActionResult<ProdutoDTO>> GetAction(int id)
+        public async Task<ActionResult<ProdutoDTO>> Get(int id)
         {
             var produto = await _uof.ProdutoRepository.GetAsync(p => p.ProdutoId == id);
 
