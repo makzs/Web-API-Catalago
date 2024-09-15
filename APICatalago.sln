@@ -5,7 +5,9 @@ VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APICatalago", "APICatalago\APICatalago.csproj", "{111A9CD7-271E-4C02-AA82-23A66A323DB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestaCORS", "TestaCORS\TestaCORS.csproj", "{F6FDB680-8BBE-4BF4-9739-73589C6CE3EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestaCORS", "TestaCORS\TestaCORS.csproj", "{F6FDB680-8BBE-4BF4-9739-73589C6CE3EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiCatalagoxUnitTest", "ApiCatalagoxUnitTest\ApiCatalagoxUnitTest.csproj", "{F5E5CD72-945F-442F-B828-6575728A9D76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F6FDB680-8BBE-4BF4-9739-73589C6CE3EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6FDB680-8BBE-4BF4-9739-73589C6CE3EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6FDB680-8BBE-4BF4-9739-73589C6CE3EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5E5CD72-945F-442F-B828-6575728A9D76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5E5CD72-945F-442F-B828-6575728A9D76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5E5CD72-945F-442F-B828-6575728A9D76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5E5CD72-945F-442F-B828-6575728A9D76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

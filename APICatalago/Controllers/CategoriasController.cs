@@ -21,6 +21,8 @@ namespace APICatalago.Controllers
     [EnableRateLimiting("fixedwindow")]
     // indica tipo de resposta
     [Produces("application/json")]
+    // aplica convenções padrões aos metodos actions
+    [ApiConventionType(typeof(DefaultApiConventions))]
     public class CategoriasController : ControllerBase
     {
 
